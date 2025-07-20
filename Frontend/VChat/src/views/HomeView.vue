@@ -22,8 +22,11 @@
 </template>
 
 <style scoped>
-/* Chiếm toàn bộ màn hình */
+
 .container {
+  position: fixed; /* đảm bảo chiếm toàn màn */
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -32,9 +35,6 @@
   justify-content: center;
   background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
   color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  box-sizing: border-box;
-  padding: 20px;
 }
 
 .logo-section {

@@ -2,6 +2,7 @@ import axios from 'axios';
 const login=async(data)=>{
     try{
         const response=await axios.post("http://localhost:5000/api/auth/login", data);
+        localStorage.setItem ("token", response.data.token);
         console.log(response.data);
         return response.data;
     }

@@ -10,7 +10,7 @@ const login = async (req, res) => {
   const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
-  localStorage.setItem("token", token);
+  
   res.status(200).json({ token, userID: user._id });
 };
 const register = async (req, res) => {

@@ -18,9 +18,7 @@ html, body, #app {
   overflow: hidden; /* ✅ Ngăn cuộn ngang */
 
   font-family: 'Poppins', sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+ 
 }
 .layout {
   display: flex;

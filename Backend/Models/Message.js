@@ -4,5 +4,6 @@ const messageSchema=new mongoose.Schmem({
     ReceiverID:{type:mongoose.Schema.Types.ObjectId,ref:'User',required:true},
     Content: {type:String,required:true},
     TimeStamp: {type:Date,default:Date.now},
-    SendStatus:{type:Boolean,default:true}
+    SendStatus:{type:Boolean,default:true},
+    LastMessage:{type:Boolean,default:false}
 })

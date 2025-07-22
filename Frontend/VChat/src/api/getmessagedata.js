@@ -19,4 +19,6 @@ const getmessagedata = async (receiveid) => {
     {
         console.log(error.message);
     }
+
 }
+export default getmessagedata;

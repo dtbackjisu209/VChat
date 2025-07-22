@@ -1,5 +1,5 @@
 const mongoose=require('mongoose');
-const messageSchema=new mongoose.Schmem({
+const messageSchema=new mongoose.Schema({
     SenderID:{type:mongoose.Schema.Types.ObjectId,ref:'User',required:true},
     ReceiverID:{type:mongoose.Schema.Types.ObjectId,ref:'User',required:true},
     Content: {type:String,required:true},
@@ -7,3 +7,4 @@ const messageSchema=new mongoose.Schmem({
     SendStatus:{type:Boolean,default:true},
     LastMessage:{type:Boolean,default:false}
 })
+module.exports=mongoose.model('Message',messageSchema);

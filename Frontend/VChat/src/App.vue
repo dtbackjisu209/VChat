@@ -4,25 +4,32 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  
-
-  <RouterView />
+  <div class="layout">
+    <RouterView />
+  </div>
 </template>
+
 
 <style>
 html, body, #app {
-  height: 100%;
-  width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* ✅ Ngăn cuộn ngang */
+  height: 100%;
+  width: 100%;
+}
 
-  font-family: 'Poppins', sans-serif;
- 
+.vchat-wrapper {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
+
+
 .layout {
+  height: 100vh;
+  width: 100vw;
   display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  overflow: hidden;
 }
+
 </style>

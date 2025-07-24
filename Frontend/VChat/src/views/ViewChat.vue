@@ -24,17 +24,30 @@
           <div v-if="ShowTimeStampID === message._id" class="TimeStamp">
             {{ FormatTime(message.TimeStamp) }}
           </div>
+
+
         </div>
+        <form @submit.prevent="Send(ReceiverID)">
+          <input v-model="SendMessageData" type="text" placeholder="Nhập tin nhắn..." />
+          <button>Gửi</button>
+        </form>
+
       </div>
+
+
+
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { onMounted } from 'vue'
+import socket from '../socket.js'
 import { FormatTime } from '../Utils/FormatTime.js'
 import getuserfrominputtext from '../api/getuserfrominputtext.js'
 import getmessagedata from '../api/getmessagedata.js'
+import GetUserLoginID from '../Utils/GetUserLoginID.js'
 const searchText = ref('')
 const UserDataList = ref([])
 const selectedUser = ref(null)
@@ -42,6 +55,9 @@ const responsemessage = ref([])
 const messagedata = ref([])
 const ShowTimeStampID = ref(null)
 const UserLoginID = ref('')
+
+const ReceiverID = ref('');
+const SendMessageData = ref('');
 const searchUser = async () => {
   if (searchText.value.trim() === '') {
     UserDataList.value = []
@@ -56,7 +72,8 @@ const searchUser = async () => {
 }
 
 const selectUser = async (user) => {
-  console.log('ID người dùng', user._id)
+  console.log('ID người dùng', user._id);
+  ReceiverID.value = user._id;
   console.log('Đã chọn user:', user)
   try {
     responsemessage.value = await getmessagedata(user._id)
@@ -71,18 +88,48 @@ const selectUser = async (user) => {
       LastMessage: msg.LastMessage,
     })).sort((a, b) => new Date(a.TimeStamp) - new Date(b.TimeStamp))
     UserLoginID.value = responsemessage._rawValue.SenderID;
-
-    messagedata.value.forEach(msg => {
-      console.log(`Msg from ${msg.SenderID} - IsMine:`, msg.SenderID === UserLoginID.value)
-    })
-
-  } catch (error) {
+} catch (error) {
     console.error('Lỗi khi truy vấn dữ liệu tin nhắn A and B', error.message)
   }
 }
 const ShowTimeFunction = (messageID) => {
   ShowTimeStampID.value = ShowTimeStampID.value === messageID ? null : messageID
 }
+const Send = (ReceiverID)=>{
+  if(ReceiverID.value==="")
+{
+  return;
+}
+else
+{ const SendData={
+  sendMessageData:SendMessageData.value,
+  SenderID:UserLoginID.value,
+  ReceiverID: ReceiverID.value
+
+}
+  socket.emit("SendMessage",SendData);
+  SendMessageData.value='';
+}
+
+
+
+
+}
+onMounted(async()=>{
+ 
+   try {
+    const res = await GetUserLoginID();
+    UserLoginID.value = res.UserLoginID;
+    console.log("UserLoginID:", UserLoginID.value);
+  } catch (error) {
+    console.error("Lỗi khi lấy ID người dùng đăng nhập", error);
+  }
+
+  socket.on('receive-message', (data) => {
+    messagedata.value.push(data);
+  });
+   
+})
 </script>
 <style scoped>
 .vchat-wrapper {

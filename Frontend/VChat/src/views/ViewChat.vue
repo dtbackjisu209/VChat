@@ -10,20 +10,19 @@
             <span class="UserName">{{ user.name }}</span>
           </li>
         </ul>
-
         <div v-if="UserDataList.length === 0 && searchText.trim() !== ''" class="no-user">
           Không tìm thấy người dùng nào.
         </div>
       </div>
 
-     
-      <div class="message-container">
-
-        <div style="background: red">HELLO</div>
-
-        <div class="message" v-for="message in messagedata" :key="message._id">
-          <div class="message-bubble">
+      <div class="message-chat">
+        <div class="message" v-for="(message, index) in messagedata" :key="message._id"
+          :class="message.SenderID === UserLoginID ? 'sent' : 'received'">
+          <div class="bubble" @click="ShowTimeFunction(message._id)">
             {{ message.Content }}
+          </div>
+          <div v-if="ShowTimeStampID === message._id" class="TimeStamp">
+            {{ FormatTime(message.TimeStamp) }}
           </div>
         </div>
       </div>
@@ -33,6 +32,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { FormatTime } from '../Utils/FormatTime.js'
 import getuserfrominputtext from '../api/getuserfrominputtext.js'
 import getmessagedata from '../api/getmessagedata.js'
 const searchText = ref('')
@@ -40,14 +40,15 @@ const UserDataList = ref([])
 const selectedUser = ref(null)
 const responsemessage = ref([])
 const messagedata = ref([])
-
+const ShowTimeStampID = ref(null)
+const UserLoginID = ref('')
 const searchUser = async () => {
   if (searchText.value.trim() === '') {
     UserDataList.value = []
     return
   }
   try {
-    const res = await getuserfrominputtext(searchText.value);
+    const res = await getuserfrominputtext(searchText.value)
     UserDataList.value = res.Users || []
   } catch (error) {
     console.error('Lỗi khi tìm kiếm:', error.message)
@@ -58,35 +59,43 @@ const selectUser = async (user) => {
   console.log('ID người dùng', user._id)
   console.log('Đã chọn user:', user)
   try {
-    responsemessage.value = await getmessagedata(user._id);
-    console.log("Dữ liệu tin nhắn", responsemessage);
-    messagedata.value = responsemessage._rawValue.MessageDataAandB.map(msg => ({
+    responsemessage.value = await getmessagedata(user._id)
+    console.log('Dữ liệu tin nhắn', responsemessage)
+    messagedata.value = responsemessage._rawValue.MessageDataAandB.map((msg) => ({
       _id: msg._id,
       SenderID: msg.SenderID,
       ReceiverID: msg.ReceiverID,
       Content: msg.Content,
       TimeStamp: msg.TimeStamp,
       SendStatus: msg.SendStatus,
-      LastMessage: msg.LastMessage
-    }));
-    console.log(messagedata.value);
+      LastMessage: msg.LastMessage,
+    })).sort((a, b) => new Date(a.TimeStamp) - new Date(b.TimeStamp))
+    UserLoginID.value = responsemessage._rawValue.SenderID;
+
+    messagedata.value.forEach(msg => {
+      console.log(`Msg from ${msg.SenderID} - IsMine:`, msg.SenderID === UserLoginID.value)
+    })
 
   } catch (error) {
     console.error('Lỗi khi truy vấn dữ liệu tin nhắn A and B', error.message)
   }
 }
+const ShowTimeFunction = (messageID) => {
+  ShowTimeStampID.value = ShowTimeStampID.value === messageID ? null : messageID
+}
 </script>
 <style scoped>
+.vchat-wrapper {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+}
+
 .messenger-container {
   width: 100%;
   height: 100%;
   display: flex;
-
   background-color: #ffffff;
-  border-radius: 0;
-  
-  box-shadow: none;
-  
 }
 
 .sidebar {
@@ -120,8 +129,6 @@ const selectUser = async (user) => {
   border-radius: 8px;
   margin-bottom: 5px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
   transition: background-color 0.2s;
 }
 
@@ -145,26 +152,56 @@ const selectUser = async (user) => {
   font-style: italic;
 }
 
-.message-container {
+.message-chat {
   flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   padding: 20px;
   background-color: #e5ddd5;
+  overflow-y: auto;
 }
 
 .message {
   display: flex;
-  margin-bottom: 10px;
+  flex-direction: column;
+  margin-bottom: 12px;
+  max-width: 100%;
 }
 
-.message-bubble {
-  max-width: 60%;
+.message.sent {
+  align-items: flex-end;
+}
+
+.message.received {
+  align-items: flex-start;
+}
+
+.bubble {
+  max-width: 70%;
   padding: 10px 14px;
-  background-color: #fff;
   border-radius: 18px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   word-break: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.message.sent .bubble {
+  background-color: #1877f2;
+  color: white;
+  border-bottom-right-radius: 4px;
+  /* Làm tròn nhẹ góc dưới bên phải */
+}
+
+.message.received .bubble {
+  background-color: #f0f0f0;
+  color: black;
+  border-bottom-left-radius: 4px;
+  /* Làm tròn nhẹ góc dưới bên trái */
+}
+
+.TimeStamp {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+  text-align: center;
 }
 </style>

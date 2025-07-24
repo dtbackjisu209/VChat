@@ -13,7 +13,7 @@ const getMessageAandB = async (req, res) => {
     });
 
     console.log(MessageDataAandB)
-    return res.status(200).json({ MessageDataAandB })
+    return res.status(200).json({ MessageDataAandB,SenderID:SendID})
 
 }
 module.exports = { getMessageAandB };

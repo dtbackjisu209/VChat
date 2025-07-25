@@ -98,8 +98,9 @@ const ShowTimeFunction = (messageID) => {
   ShowTimeStampID.value = ShowTimeStampID.value === messageID ? null : messageID
 }
 const Send = () => {
-  if (!ReceiverID.value) {
-    return;
+  const content = SendMessageData.value.trim()
+  if (!ReceiverID.value || content === '') {
+    return; 
   }
   else {
     const SendData = {
@@ -208,6 +209,7 @@ onMounted(async () => {
   padding: 20px;
   background-color: #e5ddd5;
   overflow-y: auto;
+    padding-bottom: 80px;
 }
 
 .message {

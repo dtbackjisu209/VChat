@@ -10,7 +10,22 @@ const messageSchema=new mongoose.Schema({
 messageSchema.methods.setLastMessage=function(){
     this.LastMessage=true;
 }
-
+messageSchema.statics.setPreviousMessageFalse=async function(senderID,receiverID){
+    await this.updateOne(
+        {
+            $or:[{SenderID:senderID,
+            ReceiverID:receiverID,
+            LastMessage:true},
+            {SenderID:receiverID,
+            ReceiverID:senderID,
+            LastMessage:true},
+            ]
+        },
+        {
+            $set:{LastMessage:false}
+        }
+    )
+}
 
 
 module.exports=mongoose.model('Message',messageSchema);

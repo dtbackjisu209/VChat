@@ -10,7 +10,7 @@ const Socket = (io) => {
     socket.on("SendMessage", async(data) => {
       console.log("Dữ liệu tin nhắn:",data);
       const toSocketID = UserID.get(data.ReceiverID);
-
+      await Message.setPreviousMessageFalse(data.SenderID,data.ReceiverID);
       const messagePayLoad = new Message({
         SenderID: data.SenderID,
         ReceiverID: data.ReceiverID,
@@ -22,12 +22,12 @@ const Socket = (io) => {
     
 
       if (toSocketID) {
-        messagePayLoad.setLastMessage();
+ 
         io.to(toSocketID).emit("receive-message", messagePayLoad);
         await messagePayLoad.save();
       }
       else
-      {messagePayLoad.setLastMessage();
+      {
           await messagePayLoad.save();
 
 

@@ -27,10 +27,12 @@
 
 
         </div>
-        <form @submit.prevent="Send(ReceiverID)">
-          <input v-model="SendMessageData" type="text" placeholder="Nhập tin nhắn..." />
-          <button>Gửi</button>
+        <form @submit.prevent="Send()" class="chat-input-wrapper-fixed">
+          <input v-model="SendMessageData" type="text" placeholder="Nhập tin nhắn..." class="chat-input" />
+          <button class="send-button">Gửi</button>
         </form>
+
+
 
       </div>
 
@@ -88,36 +90,36 @@ const selectUser = async (user) => {
       LastMessage: msg.LastMessage,
     })).sort((a, b) => new Date(a.TimeStamp) - new Date(b.TimeStamp))
     UserLoginID.value = responsemessage._rawValue.SenderID;
-} catch (error) {
+  } catch (error) {
     console.error('Lỗi khi truy vấn dữ liệu tin nhắn A and B', error.message)
   }
 }
 const ShowTimeFunction = (messageID) => {
   ShowTimeStampID.value = ShowTimeStampID.value === messageID ? null : messageID
 }
-const Send = (ReceiverID)=>{
-  if(ReceiverID.value==="")
-{
-  return;
-}
-else
-{ const SendData={
-  sendMessageData:SendMessageData.value,
-  SenderID:UserLoginID.value,
-  ReceiverID: ReceiverID.value
+const Send = () => {
+  if (!ReceiverID.value) {
+    return;
+  }
+  else {
+    const SendData = {
+      sendMessageData: SendMessageData.value,
+      SenderID: UserLoginID.value,
+      ReceiverID: ReceiverID.value
+
+    }
+    console.log("SendData", SendData);
+    socket.emit("SendMessage", SendData);
+    SendMessageData.value = '';
+  }
+
+
+
 
 }
-  socket.emit("SendMessage",SendData);
-  SendMessageData.value='';
-}
+onMounted(async () => {
 
-
-
-
-}
-onMounted(async()=>{
- 
-   try {
+  try {
     const res = await GetUserLoginID();
     UserLoginID.value = res.UserLoginID;
     console.log("UserLoginID:", UserLoginID.value);
@@ -128,7 +130,7 @@ onMounted(async()=>{
   socket.on('receive-message', (data) => {
     messagedata.value.push(data);
   });
-   
+
 })
 </script>
 <style scoped>
@@ -251,4 +253,48 @@ onMounted(async()=>{
   margin-top: 4px;
   text-align: center;
 }
+
+.chat-input-wrapper-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 30%; /* bằng chiều rộng sidebar */
+  width: 70%; /* phần còn lại của màn hình */
+  display: flex;
+  padding: 12px;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.chat-input:focus {
+  border-color: #1877f2;
+}
+
+.send-button {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.send-button:hover {
+  background-color: #145dc2;
+}
+
 </style>

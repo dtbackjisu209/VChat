@@ -7,4 +7,10 @@ const messageSchema=new mongoose.Schema({
     SendStatus:{type:Boolean,default:true},
     LastMessage:{type:Boolean,default:false}
 })
+messageSchema.methods.setLastMessage=function(){
+    this.LastMessage=true;
+}
+
+
+
 module.exports=mongoose.model('Message',messageSchema);

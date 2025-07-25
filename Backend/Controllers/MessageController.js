@@ -16,4 +16,5 @@ const getMessageAandB = async (req, res) => {
     return res.status(200).json({ MessageDataAandB,SenderID:SendID})
 
 }
+
 module.exports = { getMessageAandB };

@@ -4,6 +4,8 @@ const getMessageAandB = async (req, res) => {
     const ReceiveID = req.body.receiveid;
     console.log("ID người gửi", SendID);
     console.log("ID người nhận", ReceiveID);
+   
+
 
     const MessageDataAandB = await Message.find({
         $or: [
@@ -11,6 +13,7 @@ const getMessageAandB = async (req, res) => {
             { SenderID: ReceiveID, ReceiverID: SendID },
         ],
     });
+   
 
     console.log(MessageDataAandB)
     return res.status(200).json({ MessageDataAandB,SenderID:SendID})

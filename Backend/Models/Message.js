@@ -11,7 +11,8 @@ messageSchema.methods.setLastMessage=function(){
     this.LastMessage=true;
 }
 messageSchema.statics.setPreviousMessageFalse=async function(senderID,receiverID){
-    await this.updateOne(
+    try{
+         await this.updateOne(
         {
             $or:[{SenderID:senderID,
             ReceiverID:receiverID,
@@ -24,8 +25,19 @@ messageSchema.statics.setPreviousMessageFalse=async function(senderID,receiverID
         {
             $set:{LastMessage:false}
         }
-    )
-}
+    );
+
+    }
+    catch(error)
+    {
+        console.log(error);
+    }
+  
+  
+    
+};
+messageSchema.index({SenderID:1,ReceiverID:1,LastMessage:1});
+messageSchema.index({SenderID:1,ReceiverID:1});
 
 
 module.exports=mongoose.model('Message',messageSchema);

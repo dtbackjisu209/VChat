@@ -10,7 +10,10 @@ const Socket = (io) => {
     socket.on("SendMessage", async(data) => {
       console.log("Dữ liệu tin nhắn:",data);
       const toSocketID = UserID.get(data.ReceiverID);
-      await Message.setPreviousMessageFalse(data.SenderID,data.ReceiverID);
+      console.log("toSocketID",toSocketID);
+     await Message.setPreviousMessageFalse(data.SenderID,data.ReceiverID);
+   
+
       const messagePayLoad = new Message({
         SenderID: data.SenderID,
         ReceiverID: data.ReceiverID,
@@ -36,9 +39,17 @@ const Socket = (io) => {
       socket.emit("receive-message", messagePayLoad);
     });
 
-    socket.on("disconnected", () => {
-      console.log("A user disconnected", socket.id);
-    });
+    
+    socket.on("disconnect", () => {
+    // Tìm và xóa userID có socket ID tương ứng
+    for (let [userID, socketID] of UserID.entries()) {
+      if (socketID === socket.id) {
+        UserID.delete(userID);
+        console.log(`User ${userID} disconnected`);
+        break;
+      }
+    }
+  });
   });
 };
 module.exports = { Socket };

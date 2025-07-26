@@ -10,8 +10,17 @@
             <span class="UserName">{{ user.name }}</span>
           </li>
         </ul>
+        <div v-for="User in TextedUserAndLastMessage">
+          <span>
+
+          </span>
+
+        </div>
         <div v-if="UserDataList.length === 0 && searchText.trim() !== ''" class="no-user">
           Không tìm thấy người dùng nào.
+        </div>
+        <div>
+
         </div>
       </div>
 
@@ -50,6 +59,7 @@ import { FormatTime } from '../Utils/FormatTime.js'
 import getuserfrominputtext from '../api/getuserfrominputtext.js'
 import getmessagedata from '../api/getmessagedata.js'
 import GetUserLoginID from '../Utils/GetUserLoginID.js'
+
 const searchText = ref('')
 const UserDataList = ref([])
 const selectedUser = ref(null)
@@ -60,6 +70,7 @@ const UserLoginID = ref('')
 
 const ReceiverID = ref('');
 const SendMessageData = ref('');
+
 const searchUser = async () => {
   if (searchText.value.trim() === '') {
     UserDataList.value = []
@@ -78,7 +89,7 @@ const selectUser = async (user) => {
   ReceiverID.value = user._id;
   console.log('Đã chọn user:', user)
   try {
-    responsemessage.value = await getmessagedata(user._id)
+    responsemessage.value = await getmessagedata(user._id);
     console.log('Dữ liệu tin nhắn', responsemessage)
     messagedata.value = responsemessage._rawValue.MessageDataAandB.map((msg) => ({
       _id: msg._id,

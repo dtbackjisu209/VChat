@@ -38,6 +38,8 @@ messageSchema.statics.setPreviousMessageFalse=async function(senderID,receiverID
 };
 messageSchema.index({SenderID:1,ReceiverID:1,LastMessage:1});
 messageSchema.index({SenderID:1,ReceiverID:1});
+messageSchema.index({ SenderID: 1, LastMessage: 1 });
+messageSchema.index({ ReceiverID: 1, LastMessage: 1 });
 
 
 module.exports=mongoose.model('Message',messageSchema);

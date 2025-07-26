@@ -2,51 +2,76 @@
   <div class="vchat-wrapper">
     <div class="messenger-container">
       <div class="sidebar">
-        <input type="text" v-model="searchText" placeholder="Tìm kiếm người dùng" @input="searchUser"
-          class="search-input" />
+        
+        <input
+          type="text"
+          v-model="searchText"
+          placeholder="Tìm kiếm người dùng"
+          @input="searchUser"
+          class="search-input"
+        />
+
+        
+        <div class="recent-users-container">
+          <div
+            class="recent-user"
+            v-for="data in TextedUsersAndLastMessage"
+            :key="data.user._id"
+            @click="selectUser(data.user)"
+          >
+            <div class="UserName">{{ data.user.name }}</div>
+            <div class="last-message">{{ data.message.Content }}</div>
+          </div>
+        </div>
+
+       
         <ul class="user-list">
-          <li v-for="user in UserDataList" :key="user.id" :class="{ active: user.id === selectedUser?.id }"
-            @click="selectUser(user)">
+          <li
+            v-for="user in UserDataList"
+            :key="user.id"
+            :class="{ active: user.id === selectedUser?.id }"
+            @click="selectUser(user)"
+          >
             <span class="UserName">{{ user.name }}</span>
           </li>
         </ul>
-        <div v-for="User in TextedUserAndLastMessage">
-          <span>
 
-          </span>
-
-        </div>
-        <div v-if="UserDataList.length === 0 && searchText.trim() !== ''" class="no-user">
+        
+        <div
+          v-if="UserDataList.length === 0 && searchText.trim() !== ''"
+          class="no-user"
+        >
           Không tìm thấy người dùng nào.
-        </div>
-        <div>
-
         </div>
       </div>
 
+      <!-- Khu vực hiển thị tin nhắn -->
       <div class="message-chat">
-        <div class="message" v-for="(message, index) in messagedata" :key="message._id"
-          :class="message.SenderID === UserLoginID ? 'sent' : 'received'">
+        <div
+          class="message"
+          v-for="(message, index) in messagedata"
+          :key="message._id"
+          :class="message.SenderID === UserLoginID ? 'sent' : 'received'"
+        >
           <div class="bubble" @click="ShowTimeFunction(message._id)">
             {{ message.Content }}
           </div>
           <div v-if="ShowTimeStampID === message._id" class="TimeStamp">
             {{ FormatTime(message.TimeStamp) }}
           </div>
-
-
         </div>
+
+        
         <form @submit.prevent="Send()" class="chat-input-wrapper-fixed">
-          <input v-model="SendMessageData" type="text" placeholder="Nhập tin nhắn..." class="chat-input" />
+          <input
+            v-model="SendMessageData"
+            type="text"
+            placeholder="Nhập tin nhắn..."
+            class="chat-input"
+          />
           <button class="send-button">Gửi</button>
         </form>
-
-
-
       </div>
-
-
-
     </div>
   </div>
 </template>
@@ -59,7 +84,8 @@ import { FormatTime } from '../Utils/FormatTime.js'
 import getuserfrominputtext from '../api/getuserfrominputtext.js'
 import getmessagedata from '../api/getmessagedata.js'
 import GetUserLoginID from '../Utils/GetUserLoginID.js'
-
+import GetTextedUsersAndLastMessage from '../api/GetUserAndLastMessage.js'
+import updateRecentUsers from '../api/updateRecentMessage.js';
 const searchText = ref('')
 const UserDataList = ref([])
 const selectedUser = ref(null)
@@ -70,7 +96,7 @@ const UserLoginID = ref('')
 
 const ReceiverID = ref('');
 const SendMessageData = ref('');
-
+const TextedUsersAndLastMessage = ref([]);
 const searchUser = async () => {
   if (searchText.value.trim() === '') {
     UserDataList.value = []
@@ -108,10 +134,13 @@ const selectUser = async (user) => {
 const ShowTimeFunction = (messageID) => {
   ShowTimeStampID.value = ShowTimeStampID.value === messageID ? null : messageID
 }
-const Send = () => {
+const refreshRecentUsers = async () => {
+  TextedUsersAndLastMessage.value = await updateRecentUsers();
+};
+const Send = async() => {
   const content = SendMessageData.value.trim()
   if (!ReceiverID.value || content === '') {
-    return; 
+    return;
   }
   else {
     const SendData = {
@@ -123,24 +152,33 @@ const Send = () => {
     console.log("SendData", SendData);
     socket.emit("SendMessage", SendData);
     SendMessageData.value = '';
+    await refreshRecentUsers();
   }
-
-
-
-
 }
+
 onMounted(async () => {
 
   try {
     const res = await GetUserLoginID();
+    const data = await GetTextedUsersAndLastMessage();
+
+    TextedUsersAndLastMessage.value = data.map((item) => ({
+      message: item.message,
+      user: item.user
+    }));
+
+    console.log("GetTextedUsersAndLastMessage", TextedUsersAndLastMessage);
+
+
     UserLoginID.value = res.UserLoginID;
     console.log("UserLoginID:", UserLoginID.value);
   } catch (error) {
     console.error("Lỗi khi lấy ID người dùng đăng nhập", error);
   }
 
-  socket.on('receive-message', (data) => {
+  socket.on('receive-message', async(data) => {
     messagedata.value.push(data);
+    await refreshRecentUsers();
   });
 
 })
@@ -182,7 +220,7 @@ onMounted(async () => {
   padding: 0;
   margin: 0;
   overflow-y: auto;
-  flex-grow: 1;
+  /* Bỏ flex-grow: 1 để user-list không chiếm toàn bộ không gian */
 }
 
 .user-list li {
@@ -220,7 +258,7 @@ onMounted(async () => {
   padding: 20px;
   background-color: #e5ddd5;
   overflow-y: auto;
-    padding-bottom: 80px;
+  padding-bottom: 80px;
 }
 
 .message {
@@ -270,8 +308,10 @@ onMounted(async () => {
 .chat-input-wrapper-fixed {
   position: fixed;
   bottom: 0;
-  left: 30%; /* bằng chiều rộng sidebar */
-  width: 70%; /* phần còn lại của màn hình */
+  left: 30%;
+  /* bằng chiều rộng sidebar */
+  width: 70%;
+  /* phần còn lại của màn hình */
   display: flex;
   padding: 12px;
   background-color: #fff;
@@ -308,6 +348,39 @@ onMounted(async () => {
 
 .send-button:hover {
   background-color: #145dc2;
+}
+
+.recent-users-container {
+  margin-top: 0; /* Xóa khoảng cách phía trên */
+  margin-bottom: 10px; /* Thêm khoảng cách phía dưới để tách biệt với user-list */
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.recent-user {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background-color: #fff;
+  margin-bottom: 6px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  transition: background-color 0.2s;
+}
+
+.recent-user:hover {
+  background-color: #e4e6eb;
+}
+
+.recent-user .UserName {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.recent-user .last-message {
+  font-size: 13px;
+  color: #555;
+  margin-top: 3px;
 }
 
 </style>

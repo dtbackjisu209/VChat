@@ -11,7 +11,11 @@
           <div class="recent-user" v-for="data in TextedUsersAndLastMessage" :key="data.user._id"
             @click="selectUser(data.user)">
             <div class="UserName">{{ data.user.name }}</div>
-            <div class="last-message">{{ data.message.Content }}</div>
+            <div class="EditLastMessage">
+              <div class="last-message">{{ data.message.Content }}</div>
+            <div class="last-message">{{ FormatTime(data.message.TimeStamp) }}</div>
+            </div>
+            
           </div>
         </div>
 
@@ -182,6 +186,11 @@ onMounted(async () => {
 })
 </script>
 <style scoped>
+.EditLastMessage{
+ 
+  display:flex;
+  flex-direction:row;
+}
 .vchat-wrapper {
   width: 100%;
   height: 100vh;

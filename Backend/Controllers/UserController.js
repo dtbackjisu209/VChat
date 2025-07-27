@@ -6,8 +6,10 @@ const getuserfrominputtext = async (req, res) => {
     const searchname = req.body.name;
     try {
         const users = await User.find({
-            name: { $regex: searchname, $options: 'i' }
+            name: { $regex: '^' + searchname, $options: 'i' }
         });
+
+
         res.status(200).json({ message: "successfully found", Users: users });
 
 
@@ -52,8 +54,8 @@ const getUserAndLastMessage = async (req, res) => {
                 };
             })
         );
-         res.status(200).json(result);
+        res.status(200).json(result);
     }
     catch (error) { console.log("Không lấy được dữ liệu tin nhắn cuối", error) };
 }
-module.exports = { getuserfrominputtext, getUserLoginID,getUserAndLastMessage };
+module.exports = { getuserfrominputtext, getUserLoginID, getUserAndLastMessage };

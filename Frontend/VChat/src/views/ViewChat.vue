@@ -2,57 +2,38 @@
   <div class="vchat-wrapper">
     <div class="messenger-container">
       <div class="sidebar">
-        
-        <input
-          type="text"
-          v-model="searchText"
-          placeholder="Tìm kiếm người dùng"
-          @input="searchUser"
-          class="search-input"
-        />
 
-        
+        <input type="text" v-model="searchText" placeholder="Tìm kiếm người dùng" @input="searchUser"
+          class="search-input" />
+
+
         <div class="recent-users-container">
-          <div
-            class="recent-user"
-            v-for="data in TextedUsersAndLastMessage"
-            :key="data.user._id"
-            @click="selectUser(data.user)"
-          >
+          <div class="recent-user" v-for="data in TextedUsersAndLastMessage" :key="data.user._id"
+            @click="selectUser(data.user)">
             <div class="UserName">{{ data.user.name }}</div>
             <div class="last-message">{{ data.message.Content }}</div>
           </div>
         </div>
 
-       
+
         <ul class="user-list">
-          <li
-            v-for="user in UserDataList"
-            :key="user.id"
-            :class="{ active: user.id === selectedUser?.id }"
-            @click="selectUser(user)"
-          >
+          <li v-for="user in UserDataList" :key="user.id" :class="{ active: user.id === selectedUser?.id }"
+            @click="selectUser(user)">
             <span class="UserName">{{ user.name }}</span>
           </li>
         </ul>
 
-        
-        <div
-          v-if="UserDataList.length === 0 && searchText.trim() !== ''"
-          class="no-user"
-        >
+
+        <div v-if="UserDataList.length === 0 && searchText.trim() !== ''" class="no-user">
           Không tìm thấy người dùng nào.
         </div>
       </div>
 
       <!-- Khu vực hiển thị tin nhắn -->
-      <div class="message-chat">
-        <div
-          class="message"
-          v-for="(message, index) in messagedata"
-          :key="message._id"
-          :class="message.SenderID === UserLoginID ? 'sent' : 'received'"
-        >
+      <div v-if="selectedUser" class="message-chat">
+
+        <div class="message" v-for="(message, index) in messagedata" :key="message._id"
+          :class="message.SenderID === UserLoginID ? 'sent' : 'received'">
           <div class="bubble" @click="ShowTimeFunction(message._id)">
             {{ message.Content }}
           </div>
@@ -61,17 +42,19 @@
           </div>
         </div>
 
-        
-        <form @submit.prevent="Send()" class="chat-input-wrapper-fixed">
-          <input
-            v-model="SendMessageData"
-            type="text"
-            placeholder="Nhập tin nhắn..."
-            class="chat-input"
-          />
-          <button class="send-button">Gửi</button>
-        </form>
+
+
+
+
+
+
+
       </div>
+      <form v-if="selectedUser" @submit.prevent="Send()" class="chat-input-wrapper-fixed">
+        <input v-model="SendMessageData" type="text" placeholder="Nhập tin nhắn..." class="chat-input" />
+        <button class="send-button">Gửi</button>
+      </form>
+
     </div>
   </div>
 </template>
@@ -113,6 +96,8 @@ const searchUser = async () => {
 const selectUser = async (user) => {
   console.log('ID người dùng', user._id);
   ReceiverID.value = user._id;
+  selectedUser.value = user;
+
   console.log('Đã chọn user:', user)
   try {
     responsemessage.value = await getmessagedata(user._id);
@@ -135,9 +120,10 @@ const ShowTimeFunction = (messageID) => {
   ShowTimeStampID.value = ShowTimeStampID.value === messageID ? null : messageID
 }
 const refreshRecentUsers = async () => {
+  console.log("Refresh");
   TextedUsersAndLastMessage.value = await updateRecentUsers();
 };
-const Send = async() => {
+const Send = async () => {
   const content = SendMessageData.value.trim()
   if (!ReceiverID.value || content === '') {
     return;
@@ -175,11 +161,23 @@ onMounted(async () => {
   } catch (error) {
     console.error("Lỗi khi lấy ID người dùng đăng nhập", error);
   }
+  socket.on('receive-message', async (data) => {
 
-  socket.on('receive-message', async(data) => {
-    messagedata.value.push(data);
+    const isCorrectChat =
+      selectedUser.value &&
+      (
+        (data.SenderID === selectedUser.value._id && data.ReceiverID === UserLoginID.value) ||
+        (data.ReceiverID === selectedUser.value._id && data.SenderID === UserLoginID.value)
+      );
+
+    if (isCorrectChat) {
+      messagedata.value.push(data);
+    }
+
     await refreshRecentUsers();
   });
+
+
 
 })
 </script>
@@ -351,8 +349,10 @@ onMounted(async () => {
 }
 
 .recent-users-container {
-  margin-top: 0; /* Xóa khoảng cách phía trên */
-  margin-bottom: 10px; /* Thêm khoảng cách phía dưới để tách biệt với user-list */
+  margin-top: 0;
+  /* Xóa khoảng cách phía trên */
+  margin-bottom: 10px;
+  /* Thêm khoảng cách phía dưới để tách biệt với user-list */
   max-height: 200px;
   overflow-y: auto;
 }
@@ -382,5 +382,4 @@ onMounted(async () => {
   color: #555;
   margin-top: 3px;
 }
-
 </style>

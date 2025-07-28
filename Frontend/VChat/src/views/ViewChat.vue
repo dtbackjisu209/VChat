@@ -10,10 +10,11 @@
         <div class="recent-users-container">
           <div class="recent-user" v-for="data in TextedUsersAndLastMessage" :key="data.user._id"
             @click="selectUser(data.user)">
+             <img :src="data.user.avatar" alt="avatar" class="avatar-img" v-if="data.user.avatar" />
             <div class="UserName">{{ data.user.name }}</div>
             <div class="EditLastMessage">
               <div class="last-message">{{ data.message.Content }}</div>
-            <div class="last-message">{{ FormatTime(data.message.TimeStamp) }}</div>
+            <div class="last-message2">{{ FormatTime(data.message.TimeStamp) }}</div>
             </div>
             
           </div>
@@ -60,10 +61,16 @@
       </form>
 
     </div>
+    <form @submit.prevent="handleUpload">
+  <input type="file" @change="onFileChange" accept="image/*" />
+  <button type="submit">Cập nhật ảnh đại diện</button>
+</form>
+
   </div>
 </template>
 
 <script setup>
+import axios from 'axios';
 import { ref } from 'vue'
 import { onMounted } from 'vue'
 import socket from '../socket.js'
@@ -84,6 +91,40 @@ const UserLoginID = ref('')
 const ReceiverID = ref('');
 const SendMessageData = ref('');
 const TextedUsersAndLastMessage = ref([]);
+const selectedFile = ref(null);
+const onFileChange = (e) => {
+  selectedFile.value = e.target.files[0];
+};
+
+const handleUpload = async () => {
+  if (!selectedFile.value) {
+    alert('Vui lòng chọn ảnh!');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('avatar', selectedFile.value);
+  formData.append('userId', UserLoginID.value); // Dùng trực tiếp từ biến đã có
+
+  try {
+    const res = await axios.post('http://localhost:5000/api/upload/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    if (res.data.success) {
+      alert('Cập nhật ảnh đại diện thành công!');
+      console.log('Link ảnh:', res.data.data.avatar);
+       await refreshRecentUsers();
+    } else {
+      alert('Đã xảy ra lỗi khi cập nhật.');
+    }
+  } catch (err) {
+    console.error('Lỗi khi upload ảnh:', err);
+    alert('Upload thất bại.');
+  }
+};
 const searchUser = async () => {
   if (searchText.value.trim() === '') {
     UserDataList.value = []
@@ -389,6 +430,21 @@ onMounted(async () => {
 .recent-user .last-message {
   font-size: 13px;
   color: #555;
+
   margin-top: 3px;
 }
+.recent-user .last-message2{
+  font-size: 13px;
+  color: #555;
+  margin-left:3%;
+  margin-top: 3px;
+}
+.avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+}
+
 </style>

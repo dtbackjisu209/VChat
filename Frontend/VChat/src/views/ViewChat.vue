@@ -3,10 +3,14 @@
     <div class="messenger-container">
       <div class="sidebar">
         <div class="user-info-container">
-          <img :src="userAvatar" alt="avatar" class="avatar-img" @click="triggerFileInput" />
-          <span class="UserName">{{ userName }}</span>
-          <input ref="fileInput" type="file" @change="onFileChange; handleUpload" accept="image/*" style="display: none;" />
+          <div class="avatar-container">
+            <img :src="userAvatar" alt="avatar" class="avatar-img" @click="triggerFileInput" />
+            <input ref="fileInput" type="file" @change="handleFileChange" accept="image/*" style="display: none;" />
+            <div class="username-text">{{ userName }}</div>
+          </div>
+          
         </div>
+
         <input type="text" v-model="searchText" placeholder="Tìm kiếm người dùng" @input="searchUser"
           class="search-input" />
 
@@ -66,7 +70,8 @@ import getmessagedata from '../api/getmessagedata.js'
 import GetUserLoginID from '../Utils/GetUserLoginID.js'
 import GetTextedUsersAndLastMessage from '../api/GetUserAndLastMessage.js'
 import updateRecentUsers from '../api/updateRecentMessage.js';
-
+import getavatarandusername from '../api/getavatarandusername.js';
+import {uploadAvatar} from '../api/upload.js';
 const searchText = ref('')
 const UserDataList = ref([])
 const selectedUser = ref(null)
@@ -74,12 +79,18 @@ const responsemessage = ref([])
 const messagedata = ref([])
 const ShowTimeStampID = ref(null)
 const UserLoginID = ref('')
-const userAvatar=ref('')
-
+const userAvatar = ref('')
+const userName = ref(' ')
 const ReceiverID = ref('');
 const SendMessageData = ref('');
 const TextedUsersAndLastMessage = ref([]);
 const selectedFile = ref(null);
+const fileInput = ref(null);
+
+const triggerFileInput = () => {
+  fileInput.value.click();
+};
+
 const onFileChange = (e) => {
   selectedFile.value = e.target.files[0];
 };
@@ -102,13 +113,19 @@ const handleUpload = async () => {
     if (data.success) {
       alert('Cập nhật ảnh đại diện thành công!');
       console.log('Link ảnh:', data.data.avatar);
+      userAvatar.value=data.data.avatar;
       await refreshRecentUsers();
     } else {
       alert('Đã xảy ra lỗi khi cập nhật.');
     }
   } catch (error) {
+      console.error("Lỗi khi upload ảnh:", error);
     alert('Upload thất bại.');
   }
+};
+const handleFileChange = async (e) => {
+  onFileChange(e);
+  await handleUpload();
 };
 
 const searchUser = async () => {
@@ -178,6 +195,7 @@ onMounted(async () => {
   try {
     const res = await GetUserLoginID();
     const data = await GetTextedUsersAndLastMessage();
+    const avatarandname = await getavatarandusername();
 
     TextedUsersAndLastMessage.value = data.map((item) => ({
       message: item.message,
@@ -186,9 +204,11 @@ onMounted(async () => {
 
     console.log("GetTextedUsersAndLastMessage", TextedUsersAndLastMessage);
 
-
+    userAvatar.value = avatarandname.Avatar;
     UserLoginID.value = res.UserLoginID;
+    userName.value = avatarandname.UserName;
     console.log("UserLoginID:", UserLoginID.value);
+    console.log(" userAvatar:", userAvatar.value);
   } catch (error) {
     console.error("Lỗi khi lấy ID người dùng đăng nhập", error);
   }

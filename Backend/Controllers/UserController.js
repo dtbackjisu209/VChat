@@ -58,4 +58,17 @@ const getUserAndLastMessage = async (req, res) => {
     }
     catch (error) { console.log("Không lấy được dữ liệu tin nhắn cuối", error) };
 }
-module.exports = { getuserfrominputtext, getUserLoginID, getUserAndLastMessage };
+const getuseravatarandusername=async(req,res)=>{
+    try{
+        UserLoginID=req.user._id;
+        const user = await User.findById(UserLoginID);
+
+        res.status(200).json({Avatar: user.avatar,UserName:user.name})
+    }
+    catch(error)
+    {
+        console.log("Không lấy được ảnh",error.message);
+    }
+
+}
+module.exports = { getuserfrominputtext, getUserLoginID, getUserAndLastMessage,getuseravatarandusername};

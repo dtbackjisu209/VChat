@@ -32,7 +32,7 @@ const avatarupload=async (req, res) => {
 
     res.status(200).json({ success: true, data: updatedUser });
   } catch (err) {
-    console.error('❌ Upload avatar failed:', err);
+    console.error('❌ Upload avatar failed:', err.message);
     res.status(500).json({ success: false, message: err.message || 'Upload failed' });
   }
 }

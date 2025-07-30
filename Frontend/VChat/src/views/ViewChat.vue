@@ -8,7 +8,7 @@
             <input ref="fileInput" type="file" @change="handleFileChange" accept="image/*" style="display: none;" />
             <div class="username-text">{{ userName }}</div>
           </div>
-          
+
         </div>
 
         <input type="text" v-model="searchText" placeholder="Tìm kiếm người dùng" @input="searchUser"
@@ -17,13 +17,20 @@
         <div class="recent-users-container">
           <div class="recent-user" v-for="data in TextedUsersAndLastMessage" :key="data.user._id"
             @click="selectUser(data.user)">
-            <img :src="data.user.avatar" alt="avatar" class="avatar-img" v-if="data.user.avatar" />
-            <div class="UserName">{{ data.user.name }}</div>
-            <div class="EditLastMessage">
-              <div class="last-message">{{ data.message.Content }}</div>
-              <div class="last-message2">{{ FormatTime(data.message.TimeStamp) }}</div>
+            <div class="recent-user-content">
+              <img :src="data.user.avatar" alt="avatar" class="avatar-img" v-if="data.user.avatar" />
+              <img :src="'/images/avatar-trang-2.jpg'" alt="avatar" class="avatar-img" v-else />
+              <div class="user-text">
+                <div class="UserName">{{ data.user.name }}</div>
+                <div class="last-line">
+                  <div class="last-message">{{ data.message.Content }}</div>
+                  <div class="last-message2">{{ FormatTime(data.message.TimeStamp) }}</div>
+                </div>
+              </div>
             </div>
           </div>
+
+
         </div>
 
         <ul class="user-list">
@@ -71,7 +78,7 @@ import GetUserLoginID from '../Utils/GetUserLoginID.js'
 import GetTextedUsersAndLastMessage from '../api/GetUserAndLastMessage.js'
 import updateRecentUsers from '../api/updateRecentMessage.js';
 import getavatarandusername from '../api/getavatarandusername.js';
-import {uploadAvatar} from '../api/upload.js';
+import { uploadAvatar } from '../api/upload.js';
 const searchText = ref('')
 const UserDataList = ref([])
 const selectedUser = ref(null)
@@ -113,13 +120,13 @@ const handleUpload = async () => {
     if (data.success) {
       alert('Cập nhật ảnh đại diện thành công!');
       console.log('Link ảnh:', data.data.avatar);
-      userAvatar.value=data.data.avatar;
+      userAvatar.value = data.data.avatar;
       await refreshRecentUsers();
     } else {
       alert('Đã xảy ra lỗi khi cập nhật.');
     }
   } catch (error) {
-      console.error("Lỗi khi upload ảnh:", error);
+    console.error("Lỗi khi upload ảnh:", error);
     alert('Upload thất bại.');
   }
 };

@@ -6,7 +6,11 @@
           <div class="avatar-container">
             <img :src="userAvatar" alt="avatar" class="avatar-img" @click="triggerFileInput" />
             <input ref="fileInput" type="file" @change="handleFileChange" accept="image/*" style="display: none;" />
-            <div class="username-text">{{ userName }}</div>
+            <div class="username-section">
+              <div class="username-text">{{ userName }}</div>
+              <button class="logout-btn" @click="logout" title="Đăng xuất">Log out</button>
+            </div>
+
           </div>
 
         </div>
@@ -47,16 +51,28 @@
 
       <!-- Khu vực hiển thị tin nhắn -->
       <div v-if="selectedUser" class="message-chat">
-        <div class="message" v-for="(message, index) in messagedata" :key="message._id"
-          :class="message.SenderID === UserLoginID ? 'sent' : 'received'">
-          <div class="bubble" @click="ShowTimeFunction(message._id)">
-            {{ message.Content }}
-          </div>
-          <div v-if="ShowTimeStampID === message._id" class="TimeStamp">
-            {{ FormatTime(message.TimeStamp) }}
+        <div class="chat-header-fixed">
+          <img :src="selectedUser.avatar" alt="avatar" class="chat-header-avatar" />
+          <div class="chat-header-name">{{ selectedUser.name }}</div>
+        </div>
+
+        <div class="chat-messages">
+          <div class="message" v-for="(message, index) in messagedata" :key="message._id"
+            :class="message.SenderID === UserLoginID ? 'sent' : 'received'">
+            <img :src="selectedUser.avatar" alt="avatar" class="message-avatar"
+              v-if="message.SenderID != UserLoginID" />
+            <div class="bubble-container">
+              <div class="bubble" @click="ShowTimeFunction(message._id)">
+                {{ message.Content }}
+              </div>
+              <div v-if="ShowTimeStampID === message._id" class="TimeStamp">
+                {{ FormatTime(message.TimeStamp) }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
       <form v-if="selectedUser" @submit.prevent="Send" class="chat-input-wrapper-fixed">
         <input v-model="SendMessageData" type="text" placeholder="Nhập tin nhắn..." class="chat-input" />
         <button class="send-button">Gửi</button>
@@ -67,7 +83,7 @@
 
 <script setup>
 import '@/assets/css/HomeView.css'
-
+import { useRouter } from 'vue-router';
 import { ref } from 'vue'
 import { onMounted } from 'vue'
 import socket from '../socket.js'
@@ -93,7 +109,7 @@ const SendMessageData = ref('');
 const TextedUsersAndLastMessage = ref([]);
 const selectedFile = ref(null);
 const fileInput = ref(null);
-
+const router = useRouter();
 const triggerFileInput = () => {
   fileInput.value.click();
 };
@@ -170,6 +186,8 @@ const selectUser = async (user) => {
   } catch (error) {
     console.error('Lỗi khi truy vấn dữ liệu tin nhắn A and B', error.message)
   }
+  searchText.value = '';
+  UserDataList.value = [];
 }
 const ShowTimeFunction = (messageID) => {
   ShowTimeStampID.value = ShowTimeStampID.value === messageID ? null : messageID
@@ -196,7 +214,10 @@ const Send = async () => {
     await refreshRecentUsers();
   }
 }
-
+const logout = async () => {
+  localStorage.removeItem('token');
+  router.replace('login');
+}
 onMounted(async () => {
 
   try {

@@ -12,5 +12,18 @@ const router = createRouter({
     { path: '/VChat',name:'VChat',component: ViewChat}
   ],
 })
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+
+  if ((to.path === '/' || to.path === '/register') && token) {
+    return next('/VChat');
+  }
+
+  if (to.path === '/VChat' && !token) {
+    return next('/login');
+  }
+
+  next();
+});
 
 export default router

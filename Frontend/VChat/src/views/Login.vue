@@ -26,11 +26,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+
 import { useRouter } from 'vue-router';
 import login from "../api/login.js";
 import socket from "../socket.js";
+import { ref } from 'vue';
 
+const UserLoginID = ref('')
 const email = ref('');
 const password = ref('');
 const router = useRouter();
@@ -47,12 +49,14 @@ const handleLogin = async () => {
     console.log("User ID:", response.userID);
     socket.emit("join",response.userID);
    
-    router.push('/VChat');
+    router.replace('/VChat');
   } catch (error) {
     console.error("Đăng nhập thất bại:", error);
     alert("Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập.");
   }
 }
+
+
 </script>
 
 <style scoped>

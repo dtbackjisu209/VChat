@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import ViewChat from '../views/ViewChat.vue'
+import CheckValidToken from '../api/CheckValidToken.js'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -12,8 +13,18 @@ const router = createRouter({
     { path: '/VChat',name:'VChat',component: ViewChat}
   ],
 })
-router.beforeEach((to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   const token = localStorage.getItem('token');
+  if(token)
+  {
+    const isValid=await CheckValidToken();
+    if(!isValid)
+    {
+      localStorage.removeItem('token');
+        return next('/login');
+    }
+    
+  }
 
   if ((to.path === '/' || to.path === '/register') && token) {
     return next('/VChat');

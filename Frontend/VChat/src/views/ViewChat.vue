@@ -70,6 +70,8 @@
               </div>
             </div>
           </div>
+          <div ref="endOfMessages" />
+          
         </div>
       </div>
 
@@ -95,6 +97,7 @@ import GetTextedUsersAndLastMessage from '../api/GetUserAndLastMessage.js'
 import updateRecentUsers from '../api/updateRecentMessage.js';
 import getavatarandusername from '../api/getavatarandusername.js';
 import { uploadAvatar } from '../api/upload.js';
+import { nextTick, watch } from 'vue'
 const searchText = ref('')
 const UserDataList = ref([])
 const selectedUser = ref(null)
@@ -110,6 +113,16 @@ const TextedUsersAndLastMessage = ref([]);
 const selectedFile = ref(null);
 const fileInput = ref(null);
 const router = useRouter();
+const endOfMessages = ref(null)
+
+
+watch(
+  () => messagedata.value.length, 
+  async () => {
+    await nextTick();
+    endOfMessages.value?.scrollIntoView({ behavior: 'auto' });
+  }
+);
 const triggerFileInput = () => {
   fileInput.value.click();
 };

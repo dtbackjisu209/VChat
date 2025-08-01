@@ -31,7 +31,20 @@ const register = async (req, res) => {
   });
   res.status(201).json({ token, userID: newuser._id });
 };
-module.exports = { login, register };
+const CheckValidToken=async(req,res)=>{
+    const user=req.user;
+    if(user)
+    {
+      return res.status(200).json({message:"Token is Valid"});
+    }
+    else
+    {
+     return res.status(401).json({ message: "Invalid token" });
+    }
+    
+
+}
+module.exports = { login, register,CheckValidToken };
 
 
 

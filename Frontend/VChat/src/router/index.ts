@@ -12,8 +12,9 @@ const router = createRouter({
     { path: '/', name: 'home', component: HomeView },
     { path: '/login', name: 'login', component: Login },
     { path: '/register', name: 'register', component: Register },
-    { path: '/VChat',name:'VChat',component: ViewChat}
+    { path: '/VChat',name:'VChat',component: ViewChat},
     { path: '/ResetPassword',name:'ResetPassword',component: ResetPassword}
+ 
   ],
 })
 router.beforeEach(async(to, from, next) => {

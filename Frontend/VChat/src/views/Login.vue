@@ -21,7 +21,7 @@
         <button type="submit" class="login-btn">Đăng nhập</button>
       </form>
       <p class="footer">Chưa có tài khoản? <router-link to="/register">Đăng ký ngay</router-link></p>
-        <p class="footer">Chưa có tài khoản? <router-link to="/ResetPassword">Đăng ký ngay</router-link></p>
+        <p class="footer">Quên mật khẩu ? <router-link to="/ResetPassword">Đặt lại mật khẩu</router-link></p>
     </div>
   </div>
 </template>

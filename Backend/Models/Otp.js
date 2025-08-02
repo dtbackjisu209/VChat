@@ -5,4 +5,5 @@ const otpschema=new mongoose.Schema({
     createdAt:{type:Date, default:Date.now,expires:500}
 
 });
+
 module.exports=mongoose.model('Otp',otpschema);

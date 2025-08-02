@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const User = require("../Models/Users");
 const bcryptjs = require("bcryptjs");
+const Otp = require("../Models/Otp");
+const sendOTP = require("../Utils/SendEmail")
 const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -10,7 +12,7 @@ const login = async (req, res) => {
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
-  
+
   res.status(200).json({ token, userID: user._id });
 };
 const register = async (req, res) => {
@@ -31,20 +33,31 @@ const register = async (req, res) => {
   });
   res.status(201).json({ token, userID: newuser._id });
 };
-const CheckValidToken=async(req,res)=>{
-    const user=req.user;
-    if(user)
-    {
-      return res.status(200).json({message:"Token is Valid"});
-    }
-    else
-    {
-     return res.status(401).json({ message: "Invalid token" });
-    }
-    
+const CheckValidToken = async (req, res) => {
+  const user = req.user;
+  if (user) {
+    return res.status(200).json({ message: "Token is Valid" });
+  }
+  else {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
 
 }
-module.exports = { login, register,CheckValidToken };
+const SendResetEmail = async (req, res) => {
+  const { ResetEmail } = req.body;
+  const finduser = await User.findOne({ ResetEmail });
+  if (!finduser) {
+    return res.status(401).json({ message: "No Email User Founded" })
+  }
+  const otpnumber = Math.floor(100000 + Math.random() * 900000).toString();
+  await Otp.create({ email: ResetEmail, otp: otpnumber });
+  await sendOTP(ResetEmail, otpnumber);
+  res.json({allowfillotp:true,message:"OTP đã được gửi đến mail của đối phương"})
+
+
+}
+module.exports = { login, register, CheckValidToken,SendResetEmail};
 
 
 

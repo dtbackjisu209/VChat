@@ -1,6 +1,6 @@
 const express=require('express');
 const router=express.Router();
-const Authorization=require('../Controllers/authcontroller');
+const Authorization=require('../Controllers/Authcontroller');
 const VerifyToken=require('../Middleware/VerifyToken.js')
 router.post('/login',Authorization.login);
 router.post('/register',Authorization.register);

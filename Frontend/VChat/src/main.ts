@@ -9,7 +9,8 @@ import router from './router'
 const app = createApp(App)
 
 app.use(createPinia())
-app.use(router)
-app.config.devtools = false
+app.use(router);
+(app.config as any).devtools = true;
+
 
 app.mount('#app')

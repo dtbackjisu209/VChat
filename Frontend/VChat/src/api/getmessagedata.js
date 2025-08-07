@@ -2,7 +2,7 @@ import axios from 'axios';
 const getmessagedata = async (receiveid) => {
     const token = localStorage.getItem("token");
     try {
-        const response = await axios.post('http://localhost:5000/api/message/getmessage', {
+        const response = await axios.post('https://vchat-vd30.onrender.com/api/message/getmessage', {
             receiveid
         }, {
             headers: {

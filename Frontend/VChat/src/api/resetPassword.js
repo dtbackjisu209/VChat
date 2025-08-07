@@ -1,7 +1,7 @@
 import axios from 'axios'
 const resetPassword=async(data)=>{
     try{
-        const response=await axios.post('http://localhost:5000/api/auth/resetPassword',data )
+        const response=await axios.post('https://vchat-vd30.onrender.com/api/auth/resetPassword',data )
         console.log(response.data);
         return response.data;
     }

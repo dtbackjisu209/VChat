@@ -3,7 +3,7 @@ const getuserfrominputtext=async(name)=>{
     try{
         const token = localStorage.getItem('token');
         console.log("TOKEN",token);
-        const response=await axios.post('http://localhost:5000/api/user/getuserfrominputtext',{name}, {
+        const response=await axios.post('https://vchat-vd30.onrender.com/api/user/getuserfrominputtext',{name}, {
         headers: {
           Authorization: `Bearer ${token}`
         }

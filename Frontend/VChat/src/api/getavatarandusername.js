@@ -2,7 +2,7 @@ import axios from 'axios'
 const getavatarandusername = async () => {
   try {
     const token = localStorage.getItem('token'); 
-    const response = await axios.get('http://localhost:5000/api/user/getuseravatarandusername', {
+    const response = await axios.get('https://vchat-vd30.onrender.com/api/user/getuseravatarandusername', {
       headers: {
         Authorization: `Bearer ${token}`
       }

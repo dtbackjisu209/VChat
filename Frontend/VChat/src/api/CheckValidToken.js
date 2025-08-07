@@ -4,7 +4,7 @@ import axios from 'axios'
 const CheckValidToken = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get('http://localhost:5000/api/auth/CheckValidToken', {
+    const response = await axios.get('https://vchat-vd30.onrender.com/api/auth/CheckValidToken', {
       headers: {
         Authorization: `Bearer ${token}`
       }

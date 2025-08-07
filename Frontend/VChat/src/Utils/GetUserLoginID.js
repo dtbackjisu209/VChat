@@ -7,7 +7,7 @@ const GetUserLoginID = async () => {
       return null; // hoặc throw new Error("No token");
     }
     console.log("TOKEN", token);
-    const response = await axios.get('http://localhost:5000/api/user/getUserLoginID', {
+    const response = await axios.get('https://vchat-vd30.onrender.com/api/user/getUserLoginID', {
       headers: {
         Authorization: `Bearer ${token}`
       }

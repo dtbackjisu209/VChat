@@ -6,7 +6,7 @@ export const uploadAvatar = async (file, userId) => {
   formData.append('userId', userId);
 
   try {
-    const res = await axios.post('http://localhost:5000/api/upload/avatar', formData, {
+    const res = await axios.post('https://vchat-vd30.onrender.com/api/upload/avatar', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return res.data;

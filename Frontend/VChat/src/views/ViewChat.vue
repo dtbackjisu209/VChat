@@ -90,7 +90,7 @@
 import '@/assets/css/HomeView.css'
 import { useRouter } from 'vue-router';
 import { ref } from 'vue'
-import { onMounted,onUnmounted } from 'vue'
+import { onMounted } from 'vue'
 import socket from '../socket.js'
 import { FormatTime } from '../Utils/FormatTime.js'
 import getuserfrominputtext from '../api/getuserfrominputtext.js'
@@ -117,7 +117,7 @@ const selectedFile = ref(null);
 const fileInput = ref(null);
 const router = useRouter();
 const endOfMessages = ref(null)
-let messageHandler = null;
+
 
 watch(
   () => messagedata.value.length,
@@ -235,28 +235,29 @@ const logout = async () => {
   router.replace('login');
 }
 onMounted(async () => {
+
   try {
     const res = await GetUserLoginID();
     const data = await GetTextedUsersAndLastMessage();
     const avatarandname = await getavatarandusername();
 
-    TextedUsersAndLastMessage.value = data.map(item => ({
+    TextedUsersAndLastMessage.value = data.map((item) => ({
       message: item.message,
       user: item.user
     }));
 
+    console.log("GetTextedUsersAndLastMessage", TextedUsersAndLastMessage);
+
     userAvatar.value = avatarandname.Avatar;
     UserLoginID.value = res.UserLoginID;
     userName.value = avatarandname.UserName;
+    console.log("UserLoginID:", UserLoginID.value);
+    console.log(" userAvatar:", userAvatar.value);
   } catch (error) {
     console.error("Lỗi khi lấy ID người dùng đăng nhập", error);
   }
+  socket.on('receive-message', async (data) => {
 
-  // Gỡ listener cũ trước khi gắn mới
-  socket.off('receive-message');
-
-  // Tạo listener mới
-  messageHandler = async (data) => {
     const isCorrectChat =
       selectedUser.value &&
       (
@@ -269,15 +270,9 @@ onMounted(async () => {
     }
 
     await refreshRecentUsers();
-  };
+  });
 
-  socket.on('receive-message', messageHandler);
-});
 
-onUnmounted(() => {
-  if (messageHandler) {
-    socket.off('receive-message', messageHandler);
-  }
-});
 
+})
 </script>

@@ -235,31 +235,28 @@ const logout = async () => {
   router.replace('login');
 }
 onMounted(async () => {
-
   try {
     const res = await GetUserLoginID();
     const data = await GetTextedUsersAndLastMessage();
     const avatarandname = await getavatarandusername();
 
-    TextedUsersAndLastMessage.value = data.map((item) => ({
+    TextedUsersAndLastMessage.value = data.map(item => ({
       message: item.message,
       user: item.user
     }));
 
-    console.log("GetTextedUsersAndLastMessage", TextedUsersAndLastMessage);
-
     userAvatar.value = avatarandname.Avatar;
     UserLoginID.value = res.UserLoginID;
     userName.value = avatarandname.UserName;
-    console.log("UserLoginID:", UserLoginID.value);
-    console.log(" userAvatar:", userAvatar.value);
   } catch (error) {
     console.error("Lỗi khi lấy ID người dùng đăng nhập", error);
   }
-  socket.on('receive-message', async (data) => {
 
-      
- messageHandler = async (data) => {
+  // Gỡ listener cũ trước khi gắn mới
+  socket.off('receive-message');
+
+  // Tạo listener mới
+  messageHandler = async (data) => {
     const isCorrectChat =
       selectedUser.value &&
       (
@@ -275,14 +272,12 @@ onMounted(async () => {
   };
 
   socket.on('receive-message', messageHandler);
-  });
+});
 
-
-
-})
 onUnmounted(() => {
   if (messageHandler) {
     socket.off('receive-message', messageHandler);
   }
-})
+});
+
 </script>

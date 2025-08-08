@@ -90,7 +90,7 @@
 import '@/assets/css/HomeView.css'
 import { useRouter } from 'vue-router';
 import { ref } from 'vue'
-import { onMounted } from 'vue'
+import { onMounted,onUnmounted } from 'vue'
 import socket from '../socket.js'
 import { FormatTime } from '../Utils/FormatTime.js'
 import getuserfrominputtext from '../api/getuserfrominputtext.js'
@@ -274,5 +274,8 @@ onMounted(async () => {
 
 
 
+})
+onUnmounted(() => {
+  socket.off('receive-message');
 })
 </script>

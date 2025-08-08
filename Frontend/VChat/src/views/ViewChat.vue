@@ -4,7 +4,10 @@
       <div class="sidebar">
         <div class="user-info-container">
           <div class="avatar-container">
-            <img :src="userAvatar" alt="avatar" class="avatar-img" @click="triggerFileInput" />
+            <img :src="userAvatar || '/images/pngtree-dark-gray-simple-avatar-png-image_3418404.jpg'" class="avatar-img"
+              @click="triggerFileInput" />
+
+
             <input ref="fileInput" type="file" @change="handleFileChange" accept="image/*" style="display: none;" />
             <div class="username-section">
               <div class="username-text">{{ userName }}</div>
@@ -71,7 +74,7 @@
             </div>
           </div>
           <div ref="endOfMessages" />
-          
+
         </div>
       </div>
 
@@ -117,7 +120,7 @@ const endOfMessages = ref(null)
 
 
 watch(
-  () => messagedata.value.length, 
+  () => messagedata.value.length,
   async () => {
     await nextTick();
     endOfMessages.value?.scrollIntoView({ behavior: 'auto' });

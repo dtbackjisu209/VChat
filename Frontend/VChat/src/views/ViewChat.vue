@@ -117,7 +117,7 @@ const selectedFile = ref(null);
 const fileInput = ref(null);
 const router = useRouter();
 const endOfMessages = ref(null)
-
+let messageHandler = null;
 
 watch(
   () => messagedata.value.length,
@@ -258,6 +258,8 @@ onMounted(async () => {
   }
   socket.on('receive-message', async (data) => {
 
+      
+ messageHandler = async (data) => {
     const isCorrectChat =
       selectedUser.value &&
       (
@@ -270,12 +272,17 @@ onMounted(async () => {
     }
 
     await refreshRecentUsers();
+  };
+
+  socket.on('receive-message', messageHandler);
   });
 
 
 
 })
 onUnmounted(() => {
-  socket.off('receive-message');
+  if (messageHandler) {
+    socket.off('receive-message', messageHandler);
+  }
 })
 </script>

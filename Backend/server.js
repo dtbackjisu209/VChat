@@ -7,7 +7,7 @@ const socketconnect=require('./socket.js');
 const server = http.createServer(app); 
 const io = new Server(server, {
   cors: {
-    origin: "https://vchat-vd30.onrender.com",
+        origin: ["https://v-chat-two.vercel.app"], // Cho phép frontend
     methods: ['GET', 'POST']
   }
 });

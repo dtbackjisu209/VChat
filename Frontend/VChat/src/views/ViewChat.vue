@@ -25,7 +25,7 @@
           <div class="recent-user" v-for="data in TextedUsersAndLastMessage" :key="data.user._id"
             @click="selectUser(data.user)">
             <div class="recent-user-content">
-              <img :src="data.user.avatar" alt="avatar" class="avatar-img" v-if="data.user.avatar" />
+              <img :src="data.user.avatar||'/images/pngtree-dark-gray-simple-avatar-png-image_3418404.jpg'"class="avatar-img" v-if="data.user.avatar" />
               <img :src="'/images/avatar-trang-2.jpg'" alt="avatar" class="avatar-img" v-else />
               <div class="user-text">
                 <div class="UserName">{{ data.user.name }}</div>
@@ -55,7 +55,7 @@
       <!-- Khu vực hiển thị tin nhắn -->
       <div v-if="selectedUser" class="message-chat">
         <div class="chat-header-fixed">
-          <img :src="selectedUser.avatar" alt="avatar" class="chat-header-avatar" />
+          <img :src="selectedUser.avatar ||'/images/pngtree-dark-gray-simple-avatar-png-image_3418404.jpg'" class="chat-header-avatar" />
           <div class="chat-header-name">{{ selectedUser.name }}</div>
         </div>
 

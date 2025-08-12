@@ -332,3 +332,15 @@
   font-size: 16px;
   color: #333;
 }
+.end-call-btn {
+  background-color: #e74c3c;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.end-call-btn:hover {
+  background-color: #c0392b;
+}
